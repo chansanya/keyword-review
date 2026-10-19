@@ -55,7 +55,6 @@
     gap: 16px 32px; padding-bottom: 24px; border-bottom: 2px solid var(--ink);
   }
   .title { font-family: var(--serif); font-weight: 700; font-size: 40px; line-height: 1.1; letter-spacing: .04em; margin: 0; }
-  .subtitle { margin: 8px 0 0; color: var(--ink-soft); max-width: 46em; }
 
   /* ---------- 连接设置 ---------- */
   .settings {
@@ -73,7 +72,6 @@
   .field-control { display: flex; gap: 6px; min-width: 0; }
   .field-control select { flex: 1; min-width: 0; }
   .model-status { min-height: 19px; }
-  .hint { font-size: 12px; color: var(--ink-soft); }
 
   /* ---------- 主体两栏 ---------- */
   .main { max-width: 720px; margin-top: 28px; }
@@ -159,7 +157,6 @@
   <header class="top">
     <div>
       <h1 class="title">网关检查站</h1>
-      <p class="subtitle">�?Higress 网关发送请求，观察放行、拦截或脱敏效果。页面直接请求下方填写的网关地址�?/p>
     </div>
   </header>
 
@@ -167,7 +164,6 @@
     <div class="field">
       <label for="f-base">网关地址</label>
       <input id="f-base" value="http://127.0.0.1:8080" autocomplete="off" spellcheck="false">
-      <span class="hint">若页面与网关端口不同，需�?Higress 路由允许此页面来源的 CORS 请求</span>
     </div>
     <div class="field">
       <label for="f-path">接口路径</label>
@@ -181,7 +177,6 @@
         </select>
         <button class="btn ghost small" id="load-models" type="button">加载模型</button>
       </div>
-      <span class="hint model-status" id="model-status" aria-live="polite">从网�?GET /v1/models 加载</span>
     </div>
     <div class="field">
       <label for="f-gwkey">网关 key</label>
@@ -194,15 +189,11 @@
     <div class="field w2">
       <label for="f-word">测试用敏感词</label>
       <input id="f-word" value="绘王" autocomplete="off">
-      <span class="hint">填一个已配置�?deny_words 里的�?/span>
     </div>
     <div class="field w2">
       <label for="f-deny">拦截提示里的关键�?/label>
       <input id="f-deny" value="屏蔽" autocomplete="off">
-      <span class="hint">响应中出现这几个字即视为被拦截，对应 deny_message</span>
     </div>
-    <div class="field w2" style="justify-content:flex-end">
-      <span class="hint">两个 key 只保存在当前页面内存中，刷新后需要重新填写；其余设置会记在本机浏览器里�?/span>
     </div>
   </section>
 
@@ -215,7 +206,6 @@
         <h2 id="h-pg">手动发�?/h2>
       </div>
       <div class="playground">
-        <label for="pg-input" class="hint">输入任意内容，看网关会放行、拦截还是脱�?/label>
         <textarea id="pg-input" placeholder="例如：我的手机号�?13800138000，帮我写一段自我介�?></textarea>
         <div class="presets" id="presets"></div>
         <div class="pg-bar">
