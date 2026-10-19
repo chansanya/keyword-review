@@ -205,4 +205,4 @@ bash scripts/test.sh
 
 ## Sub2API 独立部署模块
 
-`modules/sub2api/` 提供独立的 Sub2API + PostgreSQL + Redis Compose 部署；Sub2API 容器加入根目录 Higress 的 `ai-gw` 网络，以 `sub2api:8080` 供网关转发，宿主机测试端口默认为 `127.0.0.1:8081`。启动顺序和安全设置见该目录 README。Sub2API 风控中心可配置输入侧关键词拦截，但只是关键词匹配，不等于语义级 AI 内容审核；此模块仅部署服务，不自动配置拦截规则。
+`modules/sub2api/` 提供独立的 Sub2API + PostgreSQL Compose 部署；Redis 使用 `.env` 指向的现有实例，不再启动 Redis 容器。Sub2API 容器加入根目录 Higress 的 `ai-gw` 网络，以 `sub2api:8080` 供网关转发，宿主机测试端口默认为 `127.0.0.1:8081`。Sub2API 需要 PostgreSQL，不支持用 MySQL 替代。启动顺序和安全设置见该目录 README。Sub2API 风控中心可配置输入侧关键词拦截，但只是关键词匹配，不等于语义级 AI 内容审核；此模块仅部署服务，不自动配置拦截规则。

@@ -1,6 +1,6 @@
 # Sub2API 部署模块
 
-该目录提供独立的 Docker Compose 部署，包含 Sub2API、PostgreSQL 和 Redis。数据库与 Redis 只在 Compose 内部网络可访问，持久数据保存在 Docker named volumes。Sub2API 容器另外加入根目录 Higress 的 `ai-gw` 网络，供 Higress 以 `sub2api:8080` 访问；因此要先启动根目录的 Higress Compose。
+该目录提供独立的 Docker Compose 部署。Sub2API 使用 PostgreSQL 和 Redis；本配置启动 PostgreSQL，Redis 连接现有 WSL 实例，不另起 Redis 容器。所有连接参数都从本目录 `.env` 读取。Sub2API 需要 PostgreSQL，不能把现有 MySQL 当作 PostgreSQL 使用；当前 Compose 会启动一个 PostgreSQL 容器。Sub2API 容器还加入根目录 Higress 的 `ai-gw` 网络，供 Higress 以 `sub2api:8080` 访问，因此要先启动根目录的 Higress Compose。
 
 ## 启动
 
@@ -15,14 +15,14 @@ docker compose up -d
 ```bash
 cp .env.example .env
 chmod 600 .env
-# 编辑 .env，至少替换 PostgreSQL 密码、JWT_SECRET、TOTP_ENCRYPTION_KEY
-# 三个密钥分别生成：openssl rand -hex 32
+# 编辑 .env：设置 DATABASE_PASSWORD、现有 WSL Redis 连接信息、JWT_SECRET、TOTP_ENCRYPTION_KEY
+# 密钥分别生成：openssl rand -hex 32
 docker compose -f compose.yaml up -d
 docker compose -f compose.yaml ps
 docker compose -f compose.yaml logs --tail=100 sub2api
 ```
 
-默认管理界面绑定在 `127.0.0.1:8081`，不会与 Higress 的 `8080` 冲突；Higress 容器通过共享网络用 `sub2api:8080` 访问，不需要把服务暴露到外网。若确实要从局域网直接访问，把 `BIND_HOST` 改为 `0.0.0.0`，并自行配置 HTTPS、访问控制与主机防火墙。首次启动若未配置管理员邮箱和密码，登录凭据会自动生成并写入应用日志；日志可能包含密码，应限制访问并及时保存/清理。
+管理界面默认绑定 `127.0.0.1:8081`，不会与 Higress 的 `8080` 冲突；Higress 通过共享 Docker 网络访问 `sub2api:8080`。Redis 默认用 `host.docker.internal:6379`，需确保 WSL 中的 Redis 允许 Docker 主机访问，并在 `.env` 填入现有 Redis 密码。若确实要从局域网直接访问 Sub2API，把 `BIND_HOST` 改为 `0.0.0.0`，并自行配置 HTTPS、访问控制与主机防火墙。首次启动若未配置管理员邮箱和密码，登录凭据会自动生成并写入应用日志；日志可能包含密码，应限制访问并及时保存/清理。
 
 停止但保留数据：
 
