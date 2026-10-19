@@ -47,7 +47,7 @@
   button, input, textarea, select { font: inherit; color: inherit; }
   :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 
-  .page { max-width: 860px; margin: 0 auto; padding: 32px 24px 64px; }
+  .page { max-width: 880px; margin: 0 auto; padding: 32px 24px 64px; }
 
   /* ---------- 头部 ---------- */
   header.top {
@@ -120,15 +120,33 @@
 
   .verdict { display: flex; align-items: center; gap: 14px; min-height: 40px; padding: 10px 0 14px; border-top: 1px dashed var(--line); }
   .verdict-text { font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- 响应展示 Tab ---------- */
+  .response-tabs { display: flex; gap: 8px; margin: 16px 0 12px; border-bottom: 1.5px solid var(--line); padding-bottom: 8px; }
+  .tab-btn {
+    background: none; border: none; padding: 6px 14px; font-size: 14px; font-weight: 600;
+    color: var(--ink-soft); cursor: pointer; border-radius: 4px; transition: all .15s ease;
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--code-bg); }
+  .tab-btn.active { color: var(--surface); background: var(--ink); }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+  .pane-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--ink-soft); }
+  .copy-btn {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 3px 10px; font-size: 12px; cursor: pointer; color: var(--ink-soft);
+  }
+  .copy-btn:hover { color: var(--ink); border-color: var(--ink); }
+
   .answer {
     min-height: 140px; max-height: 460px; overflow: auto; padding: 14px 16px;
     border-radius: 6px; background: var(--bg); white-space: pre-wrap; word-break: break-word;
   }
   .answer.empty { color: var(--ink-soft); }
-  details.raw { margin-top: 16px; }
-  details.raw summary { cursor: pointer; font-size: 13px; color: var(--ink-soft); user-select: none; }
-  details.raw pre {
-    margin: 8px 0 0; padding: 12px 14px; max-height: 360px; overflow: auto;
+
+  .code-view {
+    margin: 0; padding: 12px 14px; max-height: 460px; overflow: auto;
     background: var(--code-bg); border-radius: 6px; border: 1px solid var(--line);
     font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-all;
   }
@@ -209,11 +227,37 @@
           <span class="stamp idle" id="pg-stamp">等待发送</span>
           <span class="verdict-text" id="pg-verdict"></span>
         </div>
-        <div class="answer empty" id="pg-answer" aria-live="polite">模型的回复会显示在这里。</div>
-        <details class="raw" id="pg-raw-details">
-          <summary>查看原始请求与响应</summary>
-          <pre id="pg-raw">（暂无）</pre>
-        </details>
+
+        <div class="response-tabs" role="tablist">
+          <button class="tab-btn active" id="tab-btn-client" type="button" data-pane="pane-client">客户端最终响应</button>
+          <button class="tab-btn" id="tab-btn-raw" type="button" data-pane="pane-raw">网关原生响应</button>
+          <button class="tab-btn" id="tab-btn-req" type="button" data-pane="pane-req">请求报文</button>
+        </div>
+
+        <div class="tab-pane active" id="pane-client">
+          <div class="pane-header">
+            <span>客户端提取内容（解析后的文本回复或拦截提示）</span>
+            <button class="copy-btn" id="copy-client" type="button">复制最终响应</button>
+          </div>
+          <div class="answer empty" id="pg-answer" aria-live="polite">模型的回复会显示在这里。</div>
+        </div>
+
+        <div class="tab-pane" id="pane-raw">
+          <div class="pane-header">
+            <span id="raw-info-header">网关返回的完整原生数据（原始 HTTP 报文 / SSE 数据流）</span>
+            <button class="copy-btn" id="copy-raw" type="button">复制原生响应</button>
+          </div>
+          <pre class="code-view" id="pg-raw">（暂无响应）</pre>
+        </div>
+
+        <div class="tab-pane" id="pane-req">
+          <div class="pane-header">
+            <span>实际发往网关的请求（含首次明文 key）</span>
+            <button class="copy-btn" id="copy-req" type="button">复制请求报文</button>
+          </div>
+          <pre class="code-view" id="pg-req">（暂无请求）</pre>
+        </div>
+
       </div>
     </section>
   </div>
@@ -231,6 +275,40 @@
   const gatewayPort = gatewayScheme === "https" ? "8443" : "8080";
   const defaultGateway = `${gatewayScheme}://${location.hostname || "127.0.0.1"}:${gatewayPort}`;
   $("f-base").value = defaultGateway;
+
+  // ---- Tab 切换 ----
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      const targetPane = $(btn.dataset.pane);
+      if (targetPane) targetPane.classList.add("active");
+    });
+  });
+
+  // ---- 复制函数 ----
+  function setupCopy(btnId, targetId, isValue) {
+    const btn = $(btnId);
+    if (!btn) return;
+    btn.addEventListener("click", async () => {
+      const el = $(targetId);
+      if (!el) return;
+      const text = isValue ? el.value : (el.textContent || "");
+      try {
+        await navigator.clipboard.writeText(text);
+        const oldText = btn.textContent;
+        btn.textContent = "已复制!";
+        setTimeout(() => { btn.textContent = oldText; }, 1500);
+      } catch (_) {
+        btn.textContent = "复制失败";
+        setTimeout(() => { btn.textContent = "复制"; }, 1500);
+      }
+    });
+  }
+  setupCopy("copy-client", "pg-answer", false);
+  setupCopy("copy-raw", "pg-raw", false);
+  setupCopy("copy-req", "pg-req", false);
 
   // ---- 设置的保存与读取（不保存 key）----
   try {
@@ -326,7 +404,7 @@
   });
 
   // ---- 发请求：同时支持普通 JSON 和 SSE 流式 ----
-  async function send({ text, stream, gwKey, onDelta }) {
+  async function send({ text, stream, gwKey, onDelta, onRawChunk }) {
     const c = cfg();
     const headers = { "Content-Type": "application/json" };
     if (gwKey) headers["x-gateway-key"] = gwKey;
@@ -346,7 +424,9 @@
         const { value, done } = await reader.read();
         if (done) break;
         const chunk = dec.decode(value, { stream: true });
-        raw += chunk; buf += chunk;
+        raw += chunk;
+        if (onRawChunk) onRawChunk(raw);
+        buf += chunk;
         const lines = buf.split(/\r?\n/);
         buf = lines.pop();
         for (const line of lines) {
@@ -366,6 +446,7 @@
         content = j.choices?.[0]?.message?.content ?? j.error?.message ?? j.errmsg ?? j.message ?? raw;
       } catch (_) { content = raw; }
       onDelta && onDelta(content);
+      if (onRawChunk) onRawChunk(raw);
     }
     return { status: res.status, ms: Math.round(performance.now() - t0), raw, content, reqHeaders: headers, reqBody: body };
   }
@@ -433,28 +514,44 @@
 
     const btn = $("pg-send");
     const ans = $("pg-answer");
+    const rawEl = $("pg-raw");
+    const reqEl = $("pg-req");
+
     btn.disabled = true;
     setStamp($("pg-stamp"), "run", "发送中");
     $("pg-verdict").textContent = "";
     ans.classList.remove("empty");
     ans.textContent = "";
-    $("pg-raw").textContent = "（等待响应中…）";
+    rawEl.textContent = "（正在接收原生流式响应…）";
+    reqEl.textContent = "（等待生成请求报文…）";
 
     try {
       const actualGwKey = noKey ? null : (c.gwKey || null);
+      const isStream = $("pg-stream").checked;
+
       const r = await send({
         text,
-        stream: $("pg-stream").checked,
+        stream: isStream,
         gwKey: actualGwKey,
-        onDelta: (s) => { ans.textContent = s; ans.scrollTop = ans.scrollHeight; },
+        onDelta: (s) => {
+          ans.textContent = s;
+          ans.scrollTop = ans.scrollHeight;
+        },
+        onRawChunk: (rawChunk) => {
+          rawEl.textContent = `<<< HTTP (Streaming)\n\n` + rawChunk;
+          rawEl.scrollTop = rawEl.scrollHeight;
+        },
       });
 
-      const reqInfo = `>>> POST ${c.url}\n` + fmtRequest(r);
-      const resInfo = `<<< HTTP ${r.status} (${r.ms} ms)\n` + (r.raw || "（空响应体）");
-      $("pg-raw").textContent = reqInfo + "\n\n" + resInfo;
+      // 1. 请求报文
+      reqEl.textContent = `POST ${c.url}\n\n` + fmtRequest(r);
 
+      // 2. 原生响应
+      rawEl.textContent = `<<< HTTP ${r.status} (${r.ms} ms)\n\n` + (r.raw || "（空响应体）");
+
+      // 3. 客户端最终响应
       if (!r.content) {
-        ans.textContent = "（没有回复内容）";
+        ans.textContent = "（没有提取到客户端回复内容）";
         ans.classList.add("empty");
       }
 
@@ -474,7 +571,7 @@
       } else if (r.status >= 400) {
         state = "warn";
         label = "上游异常";
-        why = `上游返回 HTTP ${r.status}，请展开下方查看原始响应`;
+        why = `上游返回 HTTP ${r.status}，可切换到“网关原生响应”查看原因`;
       } else if (/\*{4}/.test(r.content) || /[0-9a-f]{32}/.test(r.content)) {
         label = "脱敏放行";
         why = "检测到回复中包含脱敏掩码，脱敏已生效";
@@ -485,7 +582,7 @@
     } catch (err) {
       setStamp($("pg-stamp"), "fail", "请求失败");
       $("pg-verdict").textContent = "请求发送失败：" + err.message;
-      $("pg-raw").textContent = "（网络或连接错误：" + err.message + "）";
+      rawEl.textContent = "（网络或连接错误：" + err.message + "）";
     } finally {
       btn.disabled = false;
     }
