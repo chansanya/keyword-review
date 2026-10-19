@@ -1,0 +1,18 @@
+# 插件：cors（仅用于浏览器检查页面调用网关）
+# 位置：控制台 → 路由配置 → 选中 AI 路由 → 策略 → cors
+#
+# 放行本地检查页的预检请求。若使用其他页面地址，按浏览器 Origin 精确添加。
+
+allow_origins:
+  - "http://localhost:8090"
+  - "http://127.0.0.1:8090"
+allow_methods:
+  - GET
+  - POST
+  - OPTIONS
+allow_headers:
+  - Content-Type
+  - Authorization
+  - x-gateway-key
+allow_credentials: false
+max_age: 600

@@ -94,7 +94,7 @@ docker compose ps
 
 想让某条路由只给指定调用方用，在路由的 key-auth 策略里粘贴 `05-key-auth.route-allow.yaml`。
 
-检查页面报 CORS 错误时，在承载 `/v1/` 的 AI 路由「策略」中添加 `cors` 插件，粘贴 `plugins/06-cors.route.yaml`。配置仅允许 `http://localhost:8090` 和 `http://127.0.0.1:8090`，并放行页面使用的 GET/POST、`Content-Type`、`Authorization`、`x-gateway-key`。若页面从其他地址打开，需把浏览器错误中的 Origin 精确加入 `allow_origins`。保存后浏览器刷新页面再试。
+检查页面报 CORS 错误时，在承载 `/v1/` 的 AI 路由「策略」中添加 `cors` 插件，粘贴 `plugins/06-cors.route.yaml`。配置仅允许 `http://localhost:8090` 和 `http://127.0.0.1:8090`，并放行页面使用的 GET/POST、`Content-Type`、`Authorization`、`x-gateway-key`。若页面从其他地址打开，需把浏览器错误中的 Origin 精确加入 `allow_origins`。保存后浏览器刷新页面再试。注意：当前 `ai-data-masking` 命中后直接生成的拦截响应可能仍缺少 `Access-Control-Allow-Origin`；这类请求在浏览器里会显示 `Failed to fetch`，单靠路由 CORS 插件配置不一定能解决。
 
 ## 五、改造三个调用方
 
@@ -205,4 +205,4 @@ bash scripts/test.sh
 
 ## Sub2API 独立部署模块
 
-`modules/sub2api/` 提供独立的 Sub2API + PostgreSQL + Redis Compose 部署，不会并入根目录 Higress Compose。具体启动与安全设置见该目录 README。Sub2API 风控中心可配置输入侧关键词拦截，但只是关键词匹配，不等于语义级 AI 内容审核；此模块仅部署服务，不自动配置拦截规则。
+`modules/sub2api/` 提供独立的 Sub2API + PostgreSQL + Redis Compose 部署；Sub2API 容器加入根目录 Higress 的 `ai-gw` 网络，以 `sub2api:8080` 供网关转发，宿主机测试端口默认为 `127.0.0.1:8081`。启动顺序和安全设置见该目录 README。Sub2API 风控中心可配置输入侧关键词拦截，但只是关键词匹配，不等于语义级 AI 内容审核；此模块仅部署服务，不自动配置拦截规则。
