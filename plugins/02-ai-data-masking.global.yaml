@@ -1,0 +1,64 @@
+# 插件：ai-data-masking（AI 数据脱敏 / 敏感词拦截）
+# 位置：控制台 → 插件配置（全局）；需要按项目区分时，在对应路由上单独配置一份
+#
+# 作用：
+#   1) 请求和响应中出现敏感词 → 直接拦截，返回 deny_message
+#   2) 手机号、身份证、邮箱、密钥等 → 替换后再发给模型（部分可在返回时还原）
+#
+# 官方说明的局限（流式模式）：
+#   - 敏感词恰好被切在两个 chunk 之间时，可能有一部分已经返回给用户
+#   - 被脱敏的内容跨 chunk 时可能无法还原
+#
+# 内置词库来源：github.com/houbb/sensitive-word（中文）
+
+# ---------- 拦截 ----------
+system_deny: true          # 启用内置敏感词库（各版本默认值不一，这里显式打开）
+deny_openai: true          # 识别 OpenAI 协议的 messages 内容（Java/Python 大多是这种）
+
+# Claude / Gemini 协议的文本位置（OpenAI 协议已由 deny_openai 覆盖）
+deny_jsonpath:
+  - "$.messages[*].content"                 # Claude：content 为字符串时
+  - "$.messages[*].content[*].text"         # Claude：content 为分段数组时
+  - "$.system"                              # Claude：system 为字符串时
+  - "$.system[*].text"                      # Claude：system 为数组时
+  - "$.contents[*].parts[*].text"           # Gemini
+  - "$.systemInstruction.parts[*].text"     # Gemini system 指令
+
+deny_raw: false            # 不要扫描整个 body：工具定义、base64 图片等会造成大量误杀
+
+# 拦截时的返回。
+#   200：OpenAI 协议下会以“模型回复”的形式把 deny_message 返回，聊天界面直接显示，体验较好
+#   400：调用方程序更容易识别为错误，适合纯后端调用
+# 如果 Java/Python 需要按错误处理，可在它们的路由上单独配置 deny_code: 400
+deny_code: 200
+deny_message: "提问或回答中包含敏感内容，已被屏蔽。"
+deny_raw_message: '{"error":{"type":"invalid_request_error","code":"content_policy_violation","message":"提问或回答中包含敏感内容，已被屏蔽。"}}'
+deny_content_type: "application/json"
+
+# 自定义敏感词：按你的业务补充。词多时建议按类别维护在 Git 里，再粘贴进来
+deny_words:
+  - "自定义敏感词示例1"
+  - "自定义敏感词示例2"
+
+# ---------- 脱敏替换（Grok 规则或标准正则） ----------
+replace_roles:
+  # 手机号 → ****
+  - regex: "%{MOBILE}"
+    type: "replace"
+    value: "****"
+  # 身份证号 → ****
+  - regex: "%{IDCARD}"
+    type: "replace"
+    value: "****"
+  # 邮箱：保留域名，返回时还原
+  - regex: "%{EMAILLOCALPART}@%{HOSTNAME:domain}"
+    type: "replace"
+    restore: true
+    value: "****@$domain"
+  # 各类 API Key：哈希后发给模型，模型回复里出现时再还原，防止密钥泄露给上游
+  - regex: "sk-[0-9a-zA-Z_-]{16,}"
+    type: "hash"
+    restore: true
+  - regex: "AKIA[0-9A-Z]{16}"
+    type: "hash"
+    restore: true

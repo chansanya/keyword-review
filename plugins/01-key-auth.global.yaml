@@ -1,0 +1,25 @@
+# 插件：key-auth（Key 认证）
+# 位置：控制台 → 插件配置（全局 / 实例级）
+#
+# 作用：给三个项目分别发一个网关 Key，网关据此识别调用方。
+#       认证通过后会自动加上请求头 X-Mse-Consumer: <name>，
+#       后面的限流、统计插件都靠它区分是谁在调用。
+#
+# 注意：
+#   - credential 不能重复，请替换成你自己生成的随机串（如 openssl rand -hex 24）
+#   - 用独立的 x-gateway-key 请求头，不占用 Authorization，
+#     这样客户端原来发给上游的 Authorization（CLI Proxy 的 key、模型厂商的 key）照常透传
+#   - 如果某个客户端没法加自定义请求头，见 README「无法加自定义请求头怎么办」
+
+global_auth: true
+consumers:
+  - name: cli-users        # 通过 CLI Proxy API 使用的客户端
+    credential: "gw-cli-REPLACE_WITH_RANDOM_STRING"
+  - name: java-app         # Java 后端
+    credential: "gw-java-REPLACE_WITH_RANDOM_STRING"
+  - name: python-app       # Python 项目
+    credential: "gw-py-REPLACE_WITH_RANDOM_STRING"
+keys:
+  - x-gateway-key
+in_header: true
+in_query: false            # 不允许把 key 放在 URL 里，避免进访问日志

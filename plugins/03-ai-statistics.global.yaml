@@ -1,0 +1,31 @@
+# 插件：ai-statistics（AI 调用统计）
+# 位置：控制台 → 插件配置（全局）
+#
+# 作用：
+#   - 默认按 OpenAI 协议统计输入/输出 token、首 token 延迟、总耗时等指标
+#   - ai-token-ratelimit 依赖它计算每次请求消耗的 token，所以必须开启
+#
+# 下面额外把调用方（key-auth 写入的 X-Mse-Consumer）记到日志里，便于审计。
+
+attributes:
+  - key: consumer
+    value_source: request_header
+    value: x-mse-consumer
+    apply_to_log: true
+
+# 如需审计“问了什么、答了什么”，可以取消下面的注释。
+# 注意：日志里会出现用户原文，务必控制日志访问权限和保留期限。
+#
+#  - key: question
+#    value_source: request_body
+#    value: messages.@reverse.0.content
+#    apply_to_log: true
+#  - key: answer
+#    value_source: response_streaming_body
+#    value: choices.0.delta.content
+#    rule: append
+#    apply_to_log: true
+#  - key: answer
+#    value_source: response_body
+#    value: choices.0.message.content
+#    apply_to_log: true

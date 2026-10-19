@@ -1,0 +1,34 @@
+# 插件：ai-token-ratelimit（按 token 限流）
+# 位置：控制台 → 插件配置（全局）
+#
+# 前置条件：
+#   1) ai-statistics 已开启（本插件靠它统计 token）
+  #   2) 控制台「服务来源」里已添加现有 Redis，地址需能从 Higress 访问
+  #      服务来源名称设为 redis 后，下面的 service_name 写成 redis.dns
+#
+# 规则按顺序匹配，第一条命中的生效。下面的数字只是起点，上线后按实际用量调整。
+
+rule_name: ai-gw-consumer-limit
+rule_items:
+  # 按调用方（key-auth 识别出的 consumer）分别限流
+  - limit_by_per_consumer: ''
+    limit_keys:
+      - key: cli-users
+        token_per_minute: 200000
+      - key: java-app
+        token_per_minute: 500000
+      - key: python-app
+        token_per_minute: 300000
+      # 兜底：其他 consumer
+      - key: "*"
+        token_per_minute: 50000
+
+rejected_code: 429
+rejected_msg: '{"error":{"type":"rate_limit_error","code":"token_rate_limited","message":"Token 用量超出限制，请稍后再试。"}}'
+
+redis:
+  service_name: redis.dns
+  service_port: 6379
+  password: "填写现有 Redis 的密码"
+  timeout: 1000
+  database: 0

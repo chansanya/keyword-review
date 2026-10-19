@@ -1,0 +1,35 @@
+# Higress AI 网关（不启动 Redis 容器）
+#
+# 说明：
+#   - higress 使用官方 All-in-One 镜像（网关 + 控制台），配置持久化到 ./data
+#   - 本项目不启动 Redis；如启用限流，请接入现有 Redis
+#   - 官方说明 All-in-One 模式主要用于本地部署和测试；生产环境建议用 Helm（K8s）
+#     或官方 standalone 脚本（配置存 Nacos/本地文件），插件配置可原样迁移
+#
+# 用法：
+#   docker compose up -d
+#   检查页面运行 bash start.sh；控制台 http://<服务器IP>:8001
+
+services:
+  higress:
+    image: higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/all-in-one:${HIGRESS_TAG:-latest}
+    container_name: higress-ai
+    restart: unless-stopped
+    environment:
+      MODE: full                 # full = 网关 + 控制台
+      USE_PLUGIN_SERVER: "on"    # 使用内置插件服务器，不必从公网镜像仓库拉插件
+    ports:
+      - "${GATEWAY_HTTP_PORT:-8080}:8080"    # 网关 HTTP
+      - "${GATEWAY_HTTPS_PORT:-8443}:8443"   # 网关 HTTPS
+      - "${CONSOLE_BIND:-127.0.0.1}:8001:8001"  # 控制台，默认只绑定本机，远程访问请走 SSH 隧道
+    volumes:
+      - ./data:/data
+    extra_hosts:
+      # 让网关能访问宿主机上运行的 CLI Proxy API / Java / Python 服务
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ai-gw
+
+networks:
+  ai-gw:
+    name: ai-gw

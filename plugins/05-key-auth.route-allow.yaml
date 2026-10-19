@@ -1,0 +1,14 @@
+# 插件：key-auth 的路由级授权（可选）
+# 位置：控制台 → 路由配置 → 选中某条路由 → 策略 → key-auth
+#
+# 作用：限制某条路由只允许指定的 consumer 访问。
+# 注意：路由级只能写 allow，不能再写 consumers/keys（认证配置只放在全局）。
+
+# 例：cli-proxy-route 只允许 CLI 用户
+allow:
+  - cli-users
+
+# 例：llm-route 只允许 Java 和 Python 项目（用在另一条路由上时替换上面的内容）
+# allow:
+#   - java-app
+#   - python-app
