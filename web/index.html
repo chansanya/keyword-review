@@ -305,8 +305,8 @@
             <div>命中拦截词库直接中断请求，返回屏蔽提示，不请求上游模型。</div>
           </div>
           <div class="case-item">
-            <div class="case-title">案例 2：手机号脱敏保护</div>
-            <div>真号替换为 <code>****</code> 传给模型，模型复述 <code>****</code>，客户端拿到也是 <code>****</code>。</div>
+            <div class="case-title">案例 2：手机号 / 身份证脱敏</div>
+            <div>真号匹配 <code>%{MOBILE}</code> 或 <code>%{IDCARD}</code> 替换为 <code>****</code> 传给模型，模型复述 <code>****</code>，防止隐私泄露。</div>
           </div>
           <div class="case-item">
             <div class="case-title">案例 3：邮箱脱敏并还原</div>
@@ -541,6 +541,7 @@
   const presets = [
     ["普通提问", "用三句话介绍一下杭州"],
     ["含手机号", "我的手机号是 13800138000，请原样复述"],
+    ["含身份证", "我的身份证号是 110101199003072396，请原样复述"],
     ["含邮箱", "把 zhangsan@example.com 这个邮箱原样写出来"],
     ["含密钥", "帮我检查这个 key 格式对不对：sk-abcdefghijklmnopqrstuvwxyz123456"],
     ["含敏感词", null],
