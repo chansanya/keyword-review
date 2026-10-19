@@ -347,8 +347,7 @@
         if (done) break;
         const chunk = dec.decode(value, { stream: true });
         raw += chunk; buf += chunk;
-        const lines = buf.split(/?
-/);
+        const lines = buf.split(/\r?\n/);
         buf = lines.pop();
         for (const line of lines) {
           const m = line.match(/^data:\s?(.*)$/);
