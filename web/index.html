@@ -64,11 +64,13 @@
   .field.w2 { grid-column: span 2; }
   .field.w3 { grid-column: span 3; }
   .field label { font-size: 13px; font-weight: 600; color: var(--ink); }
-  .field input {
-    width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px;
+  .field input, .field select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
     background: var(--surface);
   }
-  .field input:focus-visible { outline-offset: 0; }
+  .field input:focus-visible, .field select:focus-visible { outline-offset: 0; }
+  .field-control { display: flex; gap: 6px; min-width: 0; }
+  .field-control select { flex: 1; min-width: 0; }
 
   /* ---------- 主体单栏 ---------- */
   .main { margin-top: 28px; }
@@ -83,7 +85,7 @@
   .btn:hover { filter: brightness(1.15); }
   .btn[disabled] { opacity: .55; cursor: progress; }
   .btn.ghost { background: transparent; color: var(--ink); }
-  .btn.small { padding: 4px 10px; font-size: 13px; font-weight: 500; }
+  .btn.small { padding: 4px 10px; font-size: 13px; font-weight: 500; white-space: nowrap; }
 
   /* ---------- 印章 ---------- */
   .stamp {
@@ -161,7 +163,12 @@
     </div>
     <div class="field w2">
       <label for="f-model">模型</label>
-      <input id="f-model" placeholder="上游可用的模型名" autocomplete="off" spellcheck="false">
+      <div class="field-control">
+        <select id="f-model" aria-label="选择模型">
+          <option value="">点击加载模型</option>
+        </select>
+        <button class="btn ghost small" id="load-models" type="button">加载模型</button>
+      </div>
     </div>
     <div class="field w3">
       <label for="f-gwkey">网关 key（可选）</label>
@@ -217,6 +224,7 @@
   const $ = (id) => document.getElementById(id);
   const fields = ["f-base", "f-path", "f-model", "f-word", "f-deny"];
   const STORE = "gw-tester-settings";
+  let preferredModel = "";
   let lastPrintedKey = "";
 
   const gatewayScheme = location.protocol === "https:" ? "https" : "http";
@@ -228,7 +236,18 @@
   try {
     const saved = JSON.parse(localStorage.getItem(STORE) || "{}");
     fields.forEach((id) => {
-      if (saved[id]) $(id).value = (id === "f-base" && saved[id] === "/gw") ? defaultGateway : saved[id];
+      if (!saved[id]) return;
+      if (id === "f-model") {
+        preferredModel = saved[id];
+        const select = $("f-model");
+        const opt = document.createElement("option");
+        opt.value = preferredModel;
+        opt.textContent = preferredModel;
+        select.replaceChildren(opt);
+        select.value = preferredModel;
+      } else {
+        $(id).value = (id === "f-base" && saved[id] === "/gw") ? defaultGateway : saved[id];
+      }
     });
   } catch (_) {}
 
@@ -254,6 +273,57 @@
     b.textContent = msg || "";
     b.classList.toggle("show", !(!msg));
   }
+
+  // ---- 加载模型按钮 ----
+  $("load-models").addEventListener("click", async () => {
+    const c = cfg();
+    const button = $("load-models");
+    const select = $("f-model");
+
+    button.disabled = true;
+    button.textContent = "加载中…";
+    banner("");
+
+    try {
+      const headers = {};
+      if (c.gwKey) headers["x-gateway-key"] = c.gwKey;
+      if (c.upKey) headers["Authorization"] = "Bearer " + c.upKey;
+      const base = $("f-base").value.trim().replace(/\/+$/, "");
+      const response = await fetch(base + "/v1/models", { headers });
+      const raw = await response.text();
+      let result;
+      try { result = JSON.parse(raw); } catch (_) { result = null; }
+      if (!response.ok) {
+        const message = result?.error?.message || result?.message || `HTTP ${response.status}`;
+        throw new Error(String(message).slice(0, 180));
+      }
+
+      const models = Array.isArray(result?.data) ? result.data
+        : Array.isArray(result?.models) ? result.models
+        : Array.isArray(result) ? result : [];
+      const ids = [...new Set(models.map((m) => typeof m === "string" ? m : m?.id).filter((id) => typeof id === "string" && id.trim()))];
+      if (!ids.length) throw new Error("接口未返回可用模型列表");
+
+      const previous = select.value || preferredModel;
+      const options = ids.map((id) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = id;
+        return option;
+      });
+      select.replaceChildren(...options);
+      select.value = ids.includes(previous) ? previous : ids[0];
+      preferredModel = select.value;
+      select.dispatchEvent(new Event("change"));
+      button.textContent = `已加载(${ids.length})`;
+      setTimeout(() => { button.textContent = "加载模型"; }, 2000);
+    } catch (error) {
+      banner("加载模型失败: " + error.message);
+      button.textContent = "加载模型";
+    } finally {
+      button.disabled = false;
+    }
+  });
 
   // ---- 发请求：同时支持普通 JSON 和 SSE 流式 ----
   async function send({ text, stream, gwKey, onDelta }) {
@@ -356,8 +426,8 @@
     const c = cfg();
 
     if (!c.model) {
-      banner("请先填写模型名称。");
-      $("f-model").focus();
+      banner("请先选择模型（点击“加载模型”）。");
+      $("load-models").focus();
       return;
     }
     banner("");
