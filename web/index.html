@@ -161,6 +161,32 @@
   @media (prefers-reduced-motion: reduce) {
     .stamp.land, .stamp.run { animation: none; }
   }
+  /* ---------- 机制与案例说明 ---------- */
+  .rules-card {
+    margin-top: 24px; padding: 18px 20px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--line); font-size: 13.5px; line-height: 1.6;
+  }
+  .rules-card summary {
+    font-weight: 700; font-size: 15px; cursor: pointer; user-select: none;
+    color: var(--ink);
+  }
+  .rules-content { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 12px; }
+  .rules-content ol { margin: 8px 0 12px 20px; padding: 0; }
+  .rules-content li { margin-bottom: 6px; }
+  .rules-content .rule-tip {
+    padding: 8px 12px; border-radius: 6px; background: var(--code-bg);
+    margin: 10px 0; font-size: 13px; color: var(--ink); border-left: 3px solid var(--pass);
+  }
+  .cases-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px;
+  }
+  @media (max-width: 700px) {
+    .cases-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  .case-item {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; font-size: 12.5px;
+  }
+  .case-title { font-weight: 700; margin-bottom: 4px; color: var(--ink); }
 </style>
 </head>
 <body>
@@ -259,7 +285,40 @@
         </div>
 
       </div>
-    </section>
+        </section>
+
+    <!-- 网关机制与测试案例说明 -->
+    <details class="rules-card" open>
+      <summary>💡 网关内容审查与脱敏机制说明（拦截 vs 替换）</summary>
+      <div class="rules-content">
+        <ol>
+          <li><strong>输入先检查敏感词（拦截）</strong>：优先扫描内置敏感词库和自定义拦截词；一旦命中，直接返回<em>“提问或回答中包含敏感内容，已被屏蔽。”</em>，<strong>不再执行后面的替换</strong>。</li>
+          <li><strong>未命中时按规则检查（替换）</strong>：若输入中匹配到 <code>replace_roles</code>（手机号、身份证、邮箱、API Key 等），先执行脱敏替换（掩码或哈希），再把处理后的内容发给模型；都没匹配则原样发送。</li>
+          <li><strong>模型回复返回时（输出与还原）</strong>：模型生成的内容同样会过敏感词检查；替换内容则根据 <code>restore</code> 设置处理。如当前邮箱规则会恢复原文，而手机号规则保持为 <code>****</code>。</li>
+        </ol>
+        <div class="rule-tip">
+          <strong>核心结论</strong>：替换主要发生在发给模型之前；它不等于拦截，通常是处理后继续放行。如果客户端（如 Cherry Studio）携带了多轮历史上下文，前轮记录中的敏感词也会触发整段拦截。
+        </div>
+        <div class="cases-grid">
+          <div class="case-item">
+            <div class="case-title">案例 1：敏感词直接拦截</div>
+            <div>命中拦截词库直接中断请求，返回屏蔽提示，不请求上游模型。</div>
+          </div>
+          <div class="case-item">
+            <div class="case-title">案例 2：手机号脱敏保护</div>
+            <div>真号替换为 <code>****</code> 传给模型，模型复述 <code>****</code>，客户端拿到也是 <code>****</code>。</div>
+          </div>
+          <div class="case-item">
+            <div class="case-title">案例 3：邮箱脱敏并还原</div>
+            <div>模型只看到 <code>****@domain</code>（防泄露），回传给客户端时网关自动还原为真实邮箱。</div>
+          </div>
+          <div class="case-item">
+            <div class="case-title">案例 4：多轮上下文误杀</div>
+            <div>Cherry Studio 会把前几轮对话一并发送，只要历史记录含敏感词即被拦截。新建会话可解决。</div>
+          </div>
+        </div>
+      </div>
+    </details>
   </div>
 </div>
 
