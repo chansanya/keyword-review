@@ -47,46 +47,37 @@
   button, input, textarea, select { font: inherit; color: inherit; }
   :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 
-  .page { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+  .page { max-width: 860px; margin: 0 auto; padding: 32px 24px 64px; }
 
   /* ---------- 头部 ---------- */
   header.top {
-    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
-    gap: 16px 32px; padding-bottom: 24px; border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px; border-bottom: 2px solid var(--ink);
   }
-  .title { font-family: var(--serif); font-weight: 700; font-size: 40px; line-height: 1.1; letter-spacing: .04em; margin: 0; }
-  .subtitle { margin: 8px 0 0; color: var(--ink-soft); max-width: 46em; }
-  .tally { display: flex; gap: 20px; align-items: baseline; }
-  .tally div { text-align: right; }
-  .tally b { display: block; font-family: var(--serif); font-size: 32px; line-height: 1; }
-  .tally span { font-size: 13px; color: var(--ink-soft); }
-  .tally .t-pass b { color: var(--pass); }
-  .tally .t-fail b { color: var(--block); }
-  .tally .t-warn b { color: var(--warn); }
+  .title { font-family: var(--serif); font-weight: 700; font-size: 34px; line-height: 1.1; letter-spacing: .04em; margin: 0; }
 
   /* ---------- 连接设置 ---------- */
   .settings {
-    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px 16px;
-    padding: 20px 0 24px; border-bottom: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px 16px;
+    padding: 24px 0; border-bottom: 1px solid var(--line);
   }
-  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .field.w2 { grid-column: span 2; }
-  .field label { font-size: 13px; color: var(--ink-soft); }
+  .field.w3 { grid-column: span 3; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--ink); }
   .field input {
-    width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+    width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px;
     background: var(--surface);
   }
   .field input:focus-visible { outline-offset: 0; }
-  .hint { font-size: 12px; color: var(--ink-soft); }
 
-  /* ---------- 主体两栏 ---------- */
-  .main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 32px; margin-top: 28px; }
+  /* ---------- 主体单栏 ---------- */
+  .main { margin-top: 28px; }
   h2 { font-family: var(--serif); font-size: 22px; margin: 0; }
   .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 
   .btn {
     display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
-    padding: 9px 18px; border-radius: 6px; border: 1.5px solid var(--ink);
+    padding: 9px 20px; border-radius: 6px; border: 1.5px solid var(--ink);
     background: var(--ink); color: var(--surface); font-weight: 600;
   }
   .btn:hover { filter: brightness(1.15); }
@@ -94,35 +85,7 @@
   .btn.ghost { background: transparent; color: var(--ink); }
   .btn.small { padding: 4px 10px; font-size: 13px; font-weight: 500; }
 
-  /* ---------- 检查清单 ---------- */
-  ol.checks { list-style: none; margin: 0; padding: 0; counter-reset: c; }
-  .check {
-    counter-increment: c; position: relative;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
-    margin-bottom: 10px; overflow: hidden;
-  }
-  .check-row {
-    display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 12px;
-    padding: 14px 16px; cursor: pointer; width: 100%; text-align: left; background: none; border: 0;
-  }
-  .check-row::before {
-    content: counter(c); font-family: var(--serif); font-size: 20px; color: var(--ink-soft); text-align: center;
-  }
-  .check-name { font-weight: 600; }
-  .check-expect { font-size: 13px; color: var(--ink-soft); }
-  .check-side { display: flex; align-items: center; gap: 12px; }
-  .check-ms { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; min-width: 4em; text-align: right; }
-
-  .check-detail { display: none; padding: 0 16px 16px 62px; }
-  .check.open .check-detail { display: block; }
-  .detail-note { margin: 0 0 8px; font-size: 13px; }
-  pre.code {
-    margin: 0; padding: 10px 12px; max-height: 260px; overflow: auto;
-    background: var(--code-bg); border-radius: 6px; border: 1px solid var(--line);
-    font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-all;
-  }
-
-  /* ---------- 印章：页面上唯一的“大动作” ---------- */
+  /* ---------- 印章 ---------- */
   .stamp {
     --c: var(--ink-soft);
     display: inline-block; min-width: 4.2em; text-align: center;
@@ -140,45 +103,40 @@
   @keyframes land { from { transform: rotate(-14deg) scale(1.9); opacity: 0; } to { transform: rotate(-5deg) scale(1); opacity: 1; } }
   @keyframes blink { 50% { opacity: .45; } }
 
-  /* ---------- 试一试 ---------- */
-  .playground { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+  /* ---------- 手动测试区 ---------- */
+  .playground { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
   .playground textarea {
-    width: 100%; min-height: 120px; resize: vertical; padding: 10px 12px;
+    width: 100%; min-height: 120px; resize: vertical; padding: 12px;
     border: 1px solid var(--line); border-radius: 6px; background: var(--bg);
   }
-  .pg-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 16px; }
-  .pg-opts { display: flex; flex-wrap: wrap; gap: 14px; font-size: 14px; color: var(--ink-soft); }
+  .pg-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 16px; }
+  .pg-opts { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; color: var(--ink-soft); }
   .pg-opts label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .chip { cursor: pointer; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-size: 13px; color: var(--ink-soft); }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { cursor: pointer; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; font-size: 13px; color: var(--ink-soft); }
   .chip:hover { border-color: var(--ink-soft); color: var(--ink); }
 
-  .verdict { display: flex; align-items: center; gap: 14px; min-height: 40px; padding: 8px 0 12px; border-top: 1px dashed var(--line); }
+  .verdict { display: flex; align-items: center; gap: 14px; min-height: 40px; padding: 10px 0 14px; border-top: 1px dashed var(--line); }
   .verdict-text { font-size: 14px; color: var(--ink-soft); }
   .answer {
-    min-height: 140px; max-height: 360px; overflow: auto; padding: 12px 14px;
+    min-height: 140px; max-height: 460px; overflow: auto; padding: 14px 16px;
     border-radius: 6px; background: var(--bg); white-space: pre-wrap; word-break: break-word;
   }
   .answer.empty { color: var(--ink-soft); }
-  details.raw { margin-top: 12px; }
-  details.raw summary { cursor: pointer; font-size: 13px; color: var(--ink-soft); }
-  details.raw pre { margin-top: 8px; }
+  details.raw { margin-top: 16px; }
+  details.raw summary { cursor: pointer; font-size: 13px; color: var(--ink-soft); user-select: none; }
+  details.raw pre {
+    margin: 8px 0 0; padding: 12px 14px; max-height: 360px; overflow: auto;
+    background: var(--code-bg); border-radius: 6px; border: 1px solid var(--line);
+    font: 12.5px/1.55 var(--mono); white-space: pre-wrap; word-break: break-all;
+  }
 
   .banner { display: none; margin-top: 16px; padding: 10px 14px; border-left: 3px solid var(--block); background: var(--surface); font-size: 14px; }
   .banner.show { display: block; }
 
-  footer { margin-top: 40px; font-size: 13px; color: var(--ink-soft); }
-
-  @media (max-width: 920px) {
+  @media (max-width: 800px) {
     .settings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .field.w2 { grid-column: span 2; }
-    .main { grid-template-columns: minmax(0, 1fr); }
-  }
-  @media (max-width: 520px) {
-    .page { padding: 20px 16px 48px; }
-    .title { font-size: 30px; }
-    .check-detail { padding-left: 16px; }
-    .check-expect { display: none; }
+    .field.w2, .field.w3 { grid-column: span 2; }
   }
   @media (prefers-reduced-motion: reduce) {
     .stamp.land, .stamp.run { animation: none; }
@@ -189,73 +147,48 @@
 <div class="page">
 
   <header class="top">
-    <div>
-      <h1 class="title">网关检查站</h1>
-      <p class="subtitle">检查 Higress 网关的认证、敏感词拦截和信息脱敏是否按预期工作。页面会直接请求下方填写的 Higress 网关地址。</p>
-    </div>
-    <div class="tally" aria-live="polite">
-      <div class="t-pass"><b id="n-pass">0</b><span>通过</span></div>
-      <div class="t-fail"><b id="n-fail">0</b><span>未通过</span></div>
-      <div class="t-warn"><b id="n-warn">0</b><span>待确认</span></div>
-    </div>
+    <h1 class="title">网关检查站</h1>
   </header>
 
   <section class="settings" aria-label="连接设置">
-    <div class="field">
+    <div class="field w2">
       <label for="f-base">网关地址</label>
       <input id="f-base" value="http://127.0.0.1:8080" autocomplete="off" spellcheck="false">
-      <span class="hint">若页面与网关端口不同，需在 Higress 路由允许此页面来源的 CORS 请求</span>
     </div>
-    <div class="field">
+    <div class="field w2">
       <label for="f-path">接口路径</label>
       <input id="f-path" value="/v1/chat/completions" autocomplete="off" spellcheck="false">
     </div>
-    <div class="field">
+    <div class="field w2">
       <label for="f-model">模型</label>
       <input id="f-model" placeholder="上游可用的模型名" autocomplete="off" spellcheck="false">
     </div>
-    <div class="field">
-      <label for="f-gwkey">网关 key</label>
-      <input id="f-gwkey" type="password" placeholder="x-gateway-key" autocomplete="off">
+    <div class="field w3">
+      <label for="f-gwkey">网关 key（可选）</label>
+      <input id="f-gwkey" type="password" placeholder="x-gateway-key（可选）" autocomplete="off">
     </div>
-    <div class="field w2">
+    <div class="field w3">
       <label for="f-upkey">上游 key（可选）</label>
-      <input id="f-upkey" type="password" placeholder="作为 Authorization: Bearer 发送" autocomplete="off">
+      <input id="f-upkey" type="password" placeholder="Authorization: Bearer（可选）" autocomplete="off">
     </div>
-    <div class="field w2">
-      <label for="f-word">测试用敏感词</label>
+    <div class="field w3">
+      <label for="f-word">测试敏感词</label>
       <input id="f-word" value="自定义敏感词示例1" autocomplete="off">
-      <span class="hint">填一个已配置在 deny_words 里的词</span>
     </div>
-    <div class="field w2">
-      <label for="f-deny">拦截提示里的关键字</label>
+    <div class="field w3">
+      <label for="f-deny">拦截提示关键字</label>
       <input id="f-deny" value="屏蔽" autocomplete="off">
-      <span class="hint">响应中出现这几个字即视为被拦截，对应 deny_message</span>
-    </div>
-    <div class="field w2" style="justify-content:flex-end">
-      <span class="hint">两个 key 只保存在当前页面内存中，刷新后需要重新填写；其余设置会记在本机浏览器里。</span>
     </div>
   </section>
 
   <div class="banner" id="banner" role="alert"></div>
 
   <div class="main">
-    <!-- 检查清单 -->
-    <section aria-labelledby="h-checks">
-      <div class="section-head">
-        <h2 id="h-checks">逐项检查</h2>
-        <button class="btn" id="run-all">开始检查</button>
-      </div>
-      <ol class="checks" id="checks"></ol>
-    </section>
-
-    <!-- 试一试 -->
     <section aria-labelledby="h-pg">
       <div class="section-head">
         <h2 id="h-pg">手动发送</h2>
       </div>
       <div class="playground">
-        <label for="pg-input" class="hint">输入任意内容，看网关会放行、拦截还是脱敏</label>
         <textarea id="pg-input" placeholder="例如：我的手机号是 13800138000，帮我写一段自我介绍"></textarea>
         <div class="presets" id="presets"></div>
         <div class="pg-bar">
@@ -270,17 +203,13 @@
           <span class="verdict-text" id="pg-verdict"></span>
         </div>
         <div class="answer empty" id="pg-answer" aria-live="polite">模型的回复会显示在这里。</div>
-        <details class="raw">
-          <summary>查看原始响应</summary>
-          <pre class="code" id="pg-raw">（暂无）</pre>
+        <details class="raw" id="pg-raw-details">
+          <summary>查看原始请求与响应</summary>
+          <pre id="pg-raw">（暂无）</pre>
         </details>
       </div>
     </section>
   </div>
-
-  <footer>
-    检查项 6 依赖模型是否照做复述，结果标为“待确认”时请展开查看回复内容。限流需要大量请求才能触发，没有放进自动检查。
-  </footer>
 </div>
 
 <script>
@@ -288,6 +217,8 @@
   const $ = (id) => document.getElementById(id);
   const fields = ["f-base", "f-path", "f-model", "f-word", "f-deny"];
   const STORE = "gw-tester-settings";
+  let lastPrintedKey = "";
+
   const gatewayScheme = location.protocol === "https:" ? "https" : "http";
   const gatewayPort = gatewayScheme === "https" ? "8443" : "8080";
   const defaultGateway = `${gatewayScheme}://${location.hostname || "127.0.0.1"}:${gatewayPort}`;
@@ -296,8 +227,11 @@
   // ---- 设置的保存与读取（不保存 key）----
   try {
     const saved = JSON.parse(localStorage.getItem(STORE) || "{}");
-    fields.forEach((id) => { if (saved[id]) $(id).value = (id === "f-base" && saved[id] === "/gw") ? defaultGateway : saved[id]; });
+    fields.forEach((id) => {
+      if (saved[id]) $(id).value = (id === "f-base" && saved[id] === "/gw") ? defaultGateway : saved[id];
+    });
   } catch (_) {}
+
   fields.forEach((id) => $(id).addEventListener("change", () => {
     try {
       const data = {};
@@ -318,14 +252,14 @@
   function banner(msg) {
     const b = $("banner");
     b.textContent = msg || "";
-    b.classList.toggle("show", !!msg);
+    b.classList.toggle("show", !(!msg));
   }
 
   // ---- 发请求：同时支持普通 JSON 和 SSE 流式 ----
   async function send({ text, stream, gwKey, onDelta }) {
     const c = cfg();
     const headers = { "Content-Type": "application/json" };
-    if (gwKey !== undefined && gwKey !== null) headers["x-gateway-key"] = gwKey;
+    if (gwKey) headers["x-gateway-key"] = gwKey;
     if (c.upKey) headers["Authorization"] = "Bearer " + c.upKey;
     const body = { model: c.model, stream, messages: [{ role: "user", content: text }] };
 
@@ -343,7 +277,8 @@
         if (done) break;
         const chunk = dec.decode(value, { stream: true });
         raw += chunk; buf += chunk;
-        const lines = buf.split(/\r?\n/);
+        const lines = buf.split(/?
+/);
         buf = lines.pop();
         for (const line of lines) {
           const m = line.match(/^data:\s?(.*)$/);
@@ -366,187 +301,36 @@
     return { status: res.status, ms: Math.round(performance.now() - t0), raw, content, reqHeaders: headers, reqBody: body };
   }
 
+  const mask = (s) => (s.length <= 8 ? "****" : s.slice(0, 4) + "…" + s.slice(-4));
+
   function fmtRequest(r) {
     const h = { ...r.reqHeaders };
-    if (h["x-gateway-key"]) h["x-gateway-key"] = mask(h["x-gateway-key"]);
+    const currentKey = h["x-gateway-key"];
+    if (currentKey) {
+      if (lastPrintedKey !== currentKey) {
+        lastPrintedKey = currentKey;
+        console.log("[网关认证 key 首次明文展示]:", currentKey);
+        // 首次打印明文，不遮盖
+      } else {
+        h["x-gateway-key"] = mask(currentKey);
+      }
+    }
     if (h["Authorization"]) h["Authorization"] = "Bearer " + mask(h["Authorization"].slice(7));
     return JSON.stringify({ headers: h, body: r.reqBody }, null, 2);
   }
-  const mask = (s) => (s.length <= 8 ? "****" : s.slice(0, 4) + "…" + s.slice(-4));
-
-  // ---- 检查项定义 ----
-  const checks = [
-    {
-      name: "不带网关 key",
-      expect: "应被拒绝，返回 401",
-      run: async () => {
-        const r = await send({ text: "你好", stream: false, gwKey: null });
-        return { r, ok: r.status === 401 ? "pass" : "fail", note: `返回 HTTP ${r.status}` };
-      },
-    },
-    {
-      name: "网关 key 错误",
-      expect: "应被拒绝，返回 401",
-      run: async () => {
-        const r = await send({ text: "你好", stream: false, gwKey: "wrong-key-for-test" });
-        return { r, ok: r.status === 401 ? "pass" : "fail", note: `返回 HTTP ${r.status}` };
-      },
-    },
-    {
-      name: "正常提问",
-      expect: "应放行，返回 200 和模型回复",
-      run: async (c) => {
-        const r = await send({ text: "用一句话介绍你自己", stream: false, gwKey: c.gwKey });
-        const blocked = r.content.includes(c.deny);
-        const ok = r.status === 200 && !blocked ? "pass" : "fail";
-        const note = r.status !== 200 ? `返回 HTTP ${r.status}，请检查模型名、上游 key 和路由`
-          : blocked ? "正常问题也被拦截了，可能是内置词库误杀" : "已放行";
-        return { r, ok, note };
-      },
-    },
-    {
-      name: "敏感词拦截（普通请求）",
-      expect: "包含测试敏感词时应被拦截",
-      run: async (c) => {
-        const r = await send({ text: `请解释一下：${c.word}`, stream: false, gwKey: c.gwKey });
-        const blocked = r.content.includes(c.deny) || r.raw.includes(c.deny);
-        return { r, ok: blocked ? "pass" : "fail", note: blocked ? "已拦截" : `响应中没有出现“${c.deny}”，请确认该词已加入 deny_words` };
-      },
-    },
-    {
-      name: "敏感词拦截（流式请求）",
-      expect: "流式请求同样应被拦截",
-      run: async (c) => {
-        const r = await send({ text: `请解释一下：${c.word}`, stream: true, gwKey: c.gwKey });
-        const blocked = r.content.includes(c.deny) || r.raw.includes(c.deny);
-        return { r, ok: blocked ? "pass" : "fail", note: blocked ? "已拦截" : `响应中没有出现“${c.deny}”` };
-      },
-    },
-    {
-      name: "手机号脱敏",
-      expect: "模型不应看到真实号码",
-      run: async (c) => {
-        const r = await send({ text: "我的手机号是 13800138000，请原样复述这个号码，不要做任何解释", stream: false, gwKey: c.gwKey });
-        let ok = "warn", note = "回复里既没有原号码也没有 ****，请展开查看模型实际回复";
-        if (r.status !== 200) { ok = "fail"; note = `返回 HTTP ${r.status}`; }
-        else if (r.content.includes("13800138000")) { ok = "fail"; note = "回复中出现了原始号码，脱敏未生效"; }
-        else if (r.content.includes("****")) { ok = "pass"; note = "模型复述的是 ****，脱敏已生效"; }
-        return { r, ok, note };
-      },
-    },
-  ];
-
-  const STAMP = { pass: "通过", fail: "未通过", warn: "待确认" };
-
-  // ---- 渲染清单 ----
-  const list = $("checks");
-  checks.forEach((ck, i) => {
-    const li = document.createElement("li");
-    li.className = "check";
-    li.innerHTML = `
-      <button class="check-row" aria-expanded="false">
-        <span><span class="check-name"></span><br><span class="check-expect"></span></span>
-        <span class="check-side"><span class="check-ms"></span><span class="stamp idle">未运行</span></span>
-      </button>
-      <div class="check-detail">
-        <p class="detail-note"></p>
-        <div class="section-head" style="margin:10px 0 6px"><span class="hint">请求</span><button class="btn ghost small rerun">只重跑这一项</button></div>
-        <pre class="code req">（尚未运行）</pre>
-        <div class="hint" style="margin:10px 0 6px">响应</div>
-        <pre class="code res">（尚未运行）</pre>
-      </div>`;
-    li.querySelector(".check-name").textContent = ck.name;
-    li.querySelector(".check-expect").textContent = ck.expect;
-    const row = li.querySelector(".check-row");
-    row.addEventListener("click", () => {
-      li.classList.toggle("open");
-      row.setAttribute("aria-expanded", li.classList.contains("open"));
-    });
-    li.querySelector(".rerun").addEventListener("click", async (e) => {
-      e.stopPropagation();
-      if (!preflight()) return;
-      await runOne(i);
-      tally();
-    });
-    ck.el = li;
-    ck.state = "idle";
-    list.appendChild(li);
-  });
 
   function setStamp(el, state, text) {
     el.className = "stamp " + state;
     el.textContent = text;
     if (["pass", "fail", "warn"].includes(state)) {
-      void el.offsetWidth;          // 重新触发动画
+      void el.offsetWidth;
       el.classList.add("land");
     }
   }
 
-  function tally() {
-    const n = { pass: 0, fail: 0, warn: 0 };
-    checks.forEach((c) => { if (n[c.state] !== undefined) n[c.state]++; });
-    $("n-pass").textContent = n.pass;
-    $("n-fail").textContent = n.fail;
-    $("n-warn").textContent = n.warn;
-  }
-
-  function preflight() {
-    const c = cfg();
-    if (!c.model) { banner("请先填写“模型”。"); $("f-model").focus(); return false; }
-    if (!c.gwKey) { banner("请先填写“网关 key”，即 key-auth 里某个调用方的 credential。"); $("f-gwkey").focus(); return false; }
-    if (location.protocol === "file:") {
-      banner("请在项目根目录运行 bash start.sh，再从 http://localhost:8090 打开页面，并在“网关地址”中填写可从当前浏览器访问的 Higress 地址。");
-      return false;
-    }
-    banner("");
-    return true;
-  }
-
-  async function runOne(i) {
-    const ck = checks[i];
-    const stamp = ck.el.querySelector(".stamp");
-    const note = ck.el.querySelector(".detail-note");
-    setStamp(stamp, "run", "检查中");
-    ck.el.querySelector(".check-ms").textContent = "";
-    try {
-      const { r, ok, note: msg } = await ck.run(cfg());
-      ck.state = ok;
-      setStamp(stamp, ok, STAMP[ok]);
-      note.textContent = msg;
-      note.style.color = ok === "pass" ? "var(--pass)" : ok === "fail" ? "var(--block)" : "var(--warn)";
-      ck.el.querySelector(".check-ms").textContent = r.ms + " ms";
-      ck.el.querySelector(".req").textContent = `POST ${cfg().url}\n` + fmtRequest(r);
-      ck.el.querySelector(".res").textContent = `HTTP ${r.status}\n\n` + (r.raw || "（空）");
-      if (ok !== "pass" && !ck.el.classList.contains("open")) ck.el.querySelector(".check-row").click();
-    } catch (err) {
-      ck.state = "fail";
-      setStamp(stamp, "fail", "未通过");
-      note.textContent = "请求没有发出去：" + err.message + "。请确认网关和测试页面都已启动，且网关地址填写正确。";
-      note.style.color = "var(--block)";
-      if (!ck.el.classList.contains("open")) ck.el.querySelector(".check-row").click();
-    }
-  }
-
-  $("run-all").addEventListener("click", async () => {
-    if (!preflight()) return;
-    const btn = $("run-all");
-    btn.disabled = true;
-    btn.textContent = "检查中…";
-    checks.forEach((c) => {
-      c.state = "idle";
-      c.el.classList.remove("open");
-      c.el.querySelector(".check-row").setAttribute("aria-expanded", "false");
-      setStamp(c.el.querySelector(".stamp"), "idle", "排队中");
-    });
-    tally();
-    for (let i = 0; i < checks.length; i++) { await runOne(i); tally(); }
-    btn.disabled = false;
-    btn.textContent = "重新检查";
-  });
-
-  // ---- 手动发送 ----
+  // ---- 预设用例 ----
   const presets = [
-    ["普通问题", "用三句话介绍一下杭州"],
+    ["普通提问", "用三句话介绍一下杭州"],
     ["含手机号", "我的手机号是 13800138000，请原样复述"],
     ["含邮箱", "把 zhangsan@example.com 这个邮箱原样写出来"],
     ["含密钥", "帮我检查这个 key 格式对不对：sk-abcdefghijklmnopqrstuvwxyz123456"],
@@ -564,14 +348,18 @@
     $("presets").appendChild(b);
   });
 
+  // ---- 发送逻辑 ----
   $("pg-send").addEventListener("click", async () => {
     const text = $("pg-input").value.trim();
     if (!text) { $("pg-input").focus(); return; }
     const noKey = $("pg-nokey").checked;
     const c = cfg();
-    if (!c.model) { banner("请先填写“模型”。"); $("f-model").focus(); return; }
-    if (!noKey && !c.gwKey) { banner("请先填写“网关 key”，或勾选“不带网关 key”。"); $("f-gwkey").focus(); return; }
-    if (location.protocol === "file:") { preflight(); return; }
+
+    if (!c.model) {
+      banner("请先填写模型名称。");
+      $("f-model").focus();
+      return;
+    }
     banner("");
 
     const btn = $("pg-send");
@@ -581,28 +369,54 @@
     $("pg-verdict").textContent = "";
     ans.classList.remove("empty");
     ans.textContent = "";
-    $("pg-raw").textContent = "（等待响应）";
+    $("pg-raw").textContent = "（等待响应中…）";
 
     try {
+      const actualGwKey = noKey ? null : (c.gwKey || null);
       const r = await send({
-        text, stream: $("pg-stream").checked, gwKey: noKey ? null : c.gwKey,
+        text,
+        stream: $("pg-stream").checked,
+        gwKey: actualGwKey,
         onDelta: (s) => { ans.textContent = s; ans.scrollTop = ans.scrollHeight; },
       });
-      $("pg-raw").textContent = `HTTP ${r.status}\n\n` + (r.raw || "（空）");
-      if (!r.content) { ans.textContent = "（没有回复内容）"; ans.classList.add("empty"); }
+
+      const reqInfo = `>>> POST ${c.url}\n` + fmtRequest(r);
+      const resInfo = `<<< HTTP ${r.status} (${r.ms} ms)\n` + (r.raw || "（空响应体）");
+      $("pg-raw").textContent = reqInfo + "\n\n" + resInfo;
+
+      if (!r.content) {
+        ans.textContent = "（没有回复内容）";
+        ans.classList.add("empty");
+      }
 
       let state = "pass", label = "已放行", why = `HTTP ${r.status}，耗时 ${r.ms} ms`;
-      if (r.status === 401 || r.status === 403) { state = "fail"; label = "未认证"; why = "网关拒绝了这个请求：网关 key 缺失、错误或无权访问该路由"; }
-      else if (r.status === 429) { state = "warn"; label = "被限流"; why = "超出 token 限流额度，稍后再试"; }
-      else if (r.content.includes(c.deny) || r.raw.includes(c.deny)) { state = "fail"; label = "已拦截"; why = "内容命中敏感词，被网关拦截"; }
-      else if (r.status >= 400) { state = "warn"; label = "出错"; why = `上游返回 HTTP ${r.status}，展开原始响应查看原因`; }
-      else if (/\*{4}/.test(r.content) || /[0-9a-f]{32}/.test(r.content)) { label = "已脱敏放行"; why = "回复中出现了脱敏后的内容"; }
+      if (r.status === 401 || r.status === 403) {
+        state = "fail";
+        label = "未认证";
+        why = "网关拒绝了请求：未提供网关 key、key 错误或无权访问该路由";
+      } else if (r.status === 429) {
+        state = "warn";
+        label = "被限流";
+        why = "超出 token 限流额度，请稍后再试";
+      } else if (r.content.includes(c.deny) || r.raw.includes(c.deny)) {
+        state = "fail";
+        label = "已拦截";
+        why = "内容命中敏感词，已被网关拦截";
+      } else if (r.status >= 400) {
+        state = "warn";
+        label = "上游异常";
+        why = `上游返回 HTTP ${r.status}，请展开下方查看原始响应`;
+      } else if (/\*{4}/.test(r.content) || /[0-9a-f]{32}/.test(r.content)) {
+        label = "脱敏放行";
+        why = "检测到回复中包含脱敏掩码，脱敏已生效";
+      }
+
       setStamp($("pg-stamp"), state, label);
       $("pg-verdict").textContent = why;
     } catch (err) {
-      setStamp($("pg-stamp"), "fail", "发送失败");
-      $("pg-verdict").textContent = "请求没有发出去：" + err.message;
-      $("pg-raw").textContent = "（无响应）";
+      setStamp($("pg-stamp"), "fail", "请求失败");
+      $("pg-verdict").textContent = "请求发送失败：" + err.message;
+      $("pg-raw").textContent = "（网络或连接错误：" + err.message + "）";
     } finally {
       btn.disabled = false;
     }
