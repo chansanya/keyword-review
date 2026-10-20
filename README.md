@@ -1,6 +1,8 @@
-# Higress AI 网关：内容审查部署方案
+# 基于 Higress 的 AI 关键词审查尝试
 
-使用 Higress（网关 + 控制台）和 Python 内置静态页面服务。Compose 不启动 Redis；后续如需 Token 限流，可接入现有 Redis。
+本项目是一次使用 Higress 网关对 AI 请求和响应进行关键词拦截、规则替换的验证性尝试，配有本地检查页面。它依赖内置词库、自定义词表和正则规则，不是完整的语义级 AI 安全审核系统，也不保证覆盖所有色情、暴力或隐私内容。
+
+默认 Compose 只启动 Higress；Token 限流是可选功能，后续可接入现有 Redis。
 
 ```
 Java / Python 项目 ─┐                         ┌─► CLI Proxy API ─► 上游模型
@@ -202,7 +204,3 @@ bash scripts/test.sh
 - ai-data-masking：https://higress.ai/en/docs/latest/user/plugins/ai/api-consumer/ai-data-masking/
 - ai-statistics：https://higress.ai/en/docs/latest/user/plugins/ai/api-o11y/ai-statistics/
 - ai-token-ratelimit：https://higress.ai/en/docs/latest/user/plugins/ai/api-consumer/ai-token-ratelimit/
-
-## Sub2API 独立部署模块
-
-`modules/sub2api/` 提供独立的 Sub2API + PostgreSQL Compose 部署；Redis 使用 `.env` 指向的现有实例，不再启动 Redis 容器。Sub2API 容器加入根目录 Higress 的 `ai-gw` 网络，以 `sub2api:8080` 供网关转发，宿主机测试端口默认为 `127.0.0.1:8081`。Sub2API 需要 PostgreSQL，不支持用 MySQL 替代。启动顺序和安全设置见该目录 README。Sub2API 风控中心可配置输入侧关键词拦截，但只是关键词匹配，不等于语义级 AI 内容审核；此模块仅部署服务，不自动配置拦截规则。
